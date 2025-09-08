@@ -1,0 +1,988 @@
+// // lib/pages/memory_game_page.dart
+// import 'package:flutter/material.dart';
+// import 'subtopic_detail_page.dart';
+// import 'dart:async';
+// import 'dart:math';
+// import 'package:flutter_tts/flutter_tts.dart';
+
+// class MemoryGamePage extends StatefulWidget {
+//   final String lessonTitle;
+//   final String lessonImage;
+
+//   const MemoryGamePage({super.key, required this.lessonTitle, required this.lessonImage});
+
+//   @override
+//   State<MemoryGamePage> createState() => _MemoryGamePageState();
+// }
+
+// class _MemoryGamePageState extends State<MemoryGamePage> {
+//   late List<Map<String, dynamic>> cards;
+//   List<int> selectedIndices = [];
+//   int score = 0;
+//   int matchesFound = 0;
+//   bool gameCompleted = false;
+//   late FlutterTts flutterTts;
+//   bool isSpanish = false;
+
+//   // Animal information for the game
+//  final List<Map<String, dynamic>> animalInfo = [
+//     {
+//       'name': 'Horse',
+//       'image': 'assets/images/horse.jpg',
+//       'description': 'Horses can sleep both standing up and lying down.They have nearly 360-degree vision.'
+//     },
+//     {
+//       'name': 'Elephant',
+//       'image': 'assets/images/elephant.png',
+//       'description': 'Elephants have the largest brain of any land animal. They use their trunk to grab objects.'
+//     },
+//     {
+//       'name': 'Deer',
+//       'image': 'assets/images/deer.jpg',
+//       'description': 'Deer are herbivorous mammals known for their speed, agility, and excellent sense of smell.'
+//     },
+//     {
+//       'name': 'Zebra',
+//       'image': 'assets/images/zebra.jpg',
+//       'description': 'Zebras are known for their unique black and white stripe patterns, which are like fingerprints, meaning no two zebras have the exact same pattern. They are herbivores, primarily grazing on grasses in various African habitats.'
+//     },
+//   ];
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _initializeGame();
+//     _initTts();
+//   }
+
+// lib/pages/memory_game_page.dart
+import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:math';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:audioplayers/audioplayers.dart';
+import '../data/animals.dart';
+
+class MemoryGamePage extends StatefulWidget {
+  final String lessonTitle;
+  final String lessonImage;
+
+  const MemoryGamePage({
+    super.key,
+    required this.lessonTitle,
+    required this.lessonImage,
+  });
+
+  @override
+  State<MemoryGamePage> createState() => _MemoryGamePageState();
+}
+
+class _MemoryGamePageState extends State<MemoryGamePage> {
+  // Spanish translations for display and TTS
+  static const Map<String, String> _spanishNames = {
+    'Horse': 'Caballo',
+    'Deer': 'Ciervo',
+    'Zebra': 'Cebra',
+    'Elephant': 'Elefante',
+    'Lion': 'León',
+    'Tiger': 'Tigre',
+    'Cheetah': 'Guepardo',
+    'Wolf': 'Lobo',
+    'Fox': 'Zorro',
+    'Bear': 'Oso',
+    'Pig': 'Cerdo',
+    'Chimpanzee': 'Chimpancé',
+    'Toucan': 'Tucán',
+    'Jaguar': 'Jaguar',
+    'Sloth': 'Perezoso',
+    'Poison Dart Frog': 'Rana venenosa',
+    'Camel': 'Camello',
+    'Fennec Fox': 'Zorro del desierto',
+    'Meerkat': 'Suricata',
+    'Gila Monster': 'Monstruo de Gila',
+    'Polar Bear': 'Oso polar',
+    'Arctic Fox': 'Zorro ártico',
+    'Walrus': 'Morsa',
+    'Harp Seal': 'Foca de Groenlandia',
+    'Reindeer': 'Reno',
+    'Snowy Owl': 'Búho nival',
+    'Dolphin': 'Delfín',
+    'Shark': 'Tiburón',
+    'Octopus': 'Pulpo',
+    'Jellyfish': 'Medusa',
+    'Clownfish': 'Pez payaso',
+    'Sea Turtle': 'Tortuga marina',
+    'Eagle': 'Águila',
+    'Hawk': 'Halcón',
+    'Woodpecker': 'Pájaro carpintero',
+    'Squirrel': 'Ardilla',
+  };
+
+  String _nameForDisplay(String englishName) {
+    if (!isSpanish) return englishName;
+    return _spanishNames[englishName] ?? englishName;
+  }
+  List<Map<String, dynamic>> cards = [];
+  List<int> selectedIndices = [];
+  int matchesFound = 0;
+  bool gameCompleted = false;
+  bool gameWon = false;
+  late FlutterTts flutterTts;
+  bool isSpanish = false;
+  late List<Map<String, dynamic>> animalInfo;
+  late AudioPlayer _sfxPlayer;
+
+  // Grid size is set by difficulty
+  int _gridColumns = 4;
+  int _gridRows = 4; // default 4x4 (overridden by difficulty)
+  int get _pairsCount => (_gridColumns * _gridRows) ~/ 2; // derived
+
+  bool isPeeking = false; // Blocks taps while initial peek is shown
+  bool canTap = true; // Blocks taps during match delay
+  bool soundEnabled = true; // Global sound toggle
+  int _peekSecondsRemaining = 0; // For peek countdown
+  int _peekTotalSeconds = 10;    // Initial reveal duration
+  Timer? _peekTimer;
+  int wrongTries = 0;
+
+  final Map<String, List<Map<String, dynamic>>> lessonData = {
+    'Herbivores': [
+      {
+        'name': 'Horse',
+        'image': 'assets/images/horse.jpg',
+        'description':
+            'Horses can sleep both standing up and lying down. They have nearly 360-degree vision.',
+      },
+      {
+        'name': 'Deer',
+        'image': 'assets/images/deer.jpg',
+        'description':
+            'Deer are herbivorous mammals known for their speed, agility, and excellent sense of smell.',
+      },
+      {
+        'name': 'Zebra',
+        'image': 'assets/images/zebra.jpg',
+        'description':
+            'Zebras are known for their unique black and white stripes, like fingerprints.',
+      },
+      {
+        'name': 'Elephant',
+        'image': 'assets/images/elephant.jpg',
+        'description':
+            'Elephants are large herbivorous mammals known for their intelligence, long trunks, and strong social bonds.',
+      },
+    ],
+    'Carnivores': [
+      {
+        'name': 'Lion',
+        'image': 'assets/images/lion.jpg',
+        'description':
+            'Lions are powerful predators known as the kings of the jungle.',
+      },
+      {
+        'name': 'Tiger',
+        'image': 'assets/images/tiger.jpg',
+        'description':
+            'Tigers are solitary hunters with distinctive orange and black stripes.',
+      },
+      {
+        'name': 'Cheetah',
+        'image': 'assets/images/cheetah.jpg',
+        'description':
+            'Cheetahs are the fastest land animals, known for their speed when chasing prey.',
+      },
+      {
+        'name': 'Wolf',
+        'image': 'assets/images/wolf.jpg',
+        'description':
+            'Wolves live and hunt in packs, and are skilled carnivorous predators.',
+      },
+    ],
+    'Omnivores': [
+      {
+        'name': 'Bear',
+        'image': 'assets/images/bear.jpg',
+        'description':
+            'Bears eat both plants and animals. They hibernate during winter.',
+      },
+      {
+        'name': 'Pig',
+        'image': 'assets/images/pig.jpg',
+        'description':
+            'Pigs are intelligent omnivores with excellent sense of smell.',
+      },
+      {
+        'name': 'Raccoon',
+        'image': 'assets/images/raccoon.jpg',
+        'description':
+            'Raccoons are clever omnivores who eat fruits, insects, and small animals.',
+      },
+      {
+        'name': 'Chimpanzee',
+        'image': 'assets/images/chimpanzee.jpg',
+        'description':
+            'Chimpanzees eat fruits, leaves, insects, and sometimes small animals or eggs.',
+      },
+    ],
+    'Rainforest': [
+      {
+        'name': 'Toucan',
+        'image': 'assets/images/toucan.jpg',
+        'description':
+            'Toucans live in rainforest canopies and are known for their colorful beaks.',
+      },
+      {
+        'name': 'Jaguar',
+        'image': 'assets/images/jaguar.jpg',
+        'description':
+            'Jaguars are strong swimmers and apex predators in the rainforest.',
+      },
+      {
+        'name': 'Sloth',
+        'image': 'assets/images/sloth.jpg',
+        'description':
+            'Sloths move slowly and spend most of their time hanging upside down in trees.',
+      },
+      {
+        'name': 'Poison Dart Frog',
+        'image': 'assets/images/poison_frog.jpg',
+        'description':
+            'Poison dart frogs are small but brightly colored and toxic.',
+      },
+    ],
+    'Desert': [
+      {
+        'name': 'Camel',
+        'image': 'assets/images/camel.jpg',
+        'description':
+            'Camels store fat in their humps and can survive long periods without water.',
+      },
+      {
+        'name': 'Fennec Fox',
+        'image': 'assets/images/fennec.jpg',
+        'description':
+            'Fennec foxes have large ears that help dissipate heat in the desert.',
+      },
+      {
+        'name': 'Meerkat',
+        'image': 'assets/images/meerkat.jpg',
+        'description':
+            'Meerkats live in groups and are known for standing on two legs to watch for danger.',
+      },
+      {
+        'name': 'Gila Monster',
+        'image': 'assets/images/gila_monster.jpg',
+        'description':
+            'The Gila monster is one of the few venomous lizards and lives in the desert.',
+      },
+    ],
+    'Butterfly': [
+      {
+        'name': 'Egg',
+        'image': 'assets/images/egg.jpg',
+        'description': 'Butterflies start as eggs on plant leaves.',
+      },
+      {
+        'name': 'Caterpillar',
+        'image': 'assets/images/caterpillar.jpg',
+        'description':
+            'Caterpillars eat leaves and grow rapidly before becoming a pupa.',
+      },
+      {
+        'name': 'Pupa',
+        'image': 'assets/images/pupa.jpg',
+        'description':
+            'The pupa stage is when a caterpillar forms a chrysalis to transform.',
+      },
+      {
+        'name': 'Adult Butterfly',
+        'image': 'assets/images/adult_butterfly.jpg',
+        'description':
+            'The adult butterfly emerges from the chrysalis with colorful wings.',
+      },
+    ],
+    'Frog': [
+      {
+        'name': 'Tadpole',
+        'image': 'assets/images/tadpole.jpg',
+        'description': 'Tadpoles live in water and gradually develop legs.',
+      },
+      {
+        'name': 'Adult Frog',
+        'image': 'assets/images/frog_adult.jpg',
+        'description':
+            'Adult frogs can jump great distances and live on land or in water.',
+      },
+      {
+        'name': 'Egg',
+        'image': 'assets/images/frog_egg.jpg',
+        'description':
+            'Frogs begin life as eggs laid in water in jelly-like clusters.',
+      },
+      {
+        'name': 'Froglet',
+        'image': 'assets/images/froglet.jpg',
+        'description':
+            'Froglets have small tails and legs and are transitioning to adult frogs.',
+      },
+    ],
+    'Producers & Consumers': [
+      {
+        'name': 'Sun',
+        'image': 'assets/images/sun.jpg',
+        'description':
+            'The sun is the primary source of energy for all life on Earth.',
+      },
+      {
+        'name': 'Grass',
+        'image': 'assets/images/grass.jpg',
+        'description':
+            'Grass is a producer that uses sunlight to make its own food.',
+      },
+      {
+        'name': 'Deer',
+        'image': 'assets/images/deer.jpg',
+        'description':
+            'Deer are herbivore consumers that feed on plants and grass.',
+      },
+      {
+        'name': 'Eagle',
+        'image': 'assets/images/eagle.jpg',
+        'description':
+            'Eagles are top consumers that hunt small animals and fish.',
+      },
+    ],
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _sfxPlayer = AudioPlayer();
+    animalInfo = kAllAnimals
+        .where((a) => (a['category'] ?? '') == widget.lessonTitle)
+        .map((a) => Map<String, dynamic>.from(a))
+        .toList();
+    _initTts();
+    // Prompt for difficulty first, then start the game
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showDifficultyDialog();
+    });
+  }
+
+  Future<void> _initTts() async {
+    flutterTts = FlutterTts();
+
+    try {
+      // Initialize TTS with better settings
+      await flutterTts.setVolume(1.0);
+      await flutterTts.setSpeechRate(0.5);
+      await flutterTts.setPitch(1.0);
+
+      // Set up completion listener
+      flutterTts.setCompletionHandler(() {
+        // Optional: Show feedback when speech completes
+        print("TTS playback completed");
+      });
+
+      // Set up error listener (log only; no SnackBars)
+      flutterTts.setErrorHandler((msg) {
+        print("TTS error: $msg");
+      });
+
+      await _setLanguage();
+    } catch (e) {
+      print("Error initializing TTS: $e");
+    }
+  }
+
+  Future<void> _setLanguage() async {
+    await flutterTts.setLanguage(isSpanish ? 'es-ES' : 'en-US');
+  }
+
+  void _applyDifficulty({required int rows, required int cols, int? peekSeconds}) {
+    setState(() {
+      _gridRows = rows;
+      _gridColumns = cols;
+      if (peekSeconds != null) _peekTotalSeconds = peekSeconds;
+      // Reset state before starting
+      cards = [];
+      selectedIndices.clear();
+      matchesFound = 0;
+      wrongTries = 0;
+      gameCompleted = false;
+      gameWon = false;
+    });
+    _initializeGame();
+  }
+
+  void _showDifficultyDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+              colors: [Color(0xFFE0F2FE), Color(0xFFBAE6FD)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Color(0xFF2E3192)),
+                  onPressed: () {
+                    Navigator.pop(context); // close dialog
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) Navigator.of(this.context).maybePop();
+                    });
+                  },
+                ),
+              ),
+              const Text(
+                'Choose Difficulty',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2E3192),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _difficultyButton(
+                label: 'Easy – 2 × 3',
+                onTap: () {
+                  Navigator.pop(context);
+                  _applyDifficulty(rows: 2, cols: 3, peekSeconds: 10);
+                },
+              ),
+              const SizedBox(height: 8),
+              _difficultyButton(
+                label: 'Medium – 2 × 4',
+                onTap: () {
+                  Navigator.pop(context);
+                  _applyDifficulty(rows: 2, cols: 4, peekSeconds: 10);
+                },
+              ),
+              const SizedBox(height: 8),
+              _difficultyButton(
+                label: 'Hard – 3 × 4',
+                onTap: () {
+                  Navigator.pop(context);
+                  _applyDifficulty(rows: 3, cols: 4, peekSeconds: 10);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _difficultyButton({required String label, required VoidCallback onTap}) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFAAFFE5),
+        foregroundColor: const Color(0xFF40196D),
+        elevation: 2,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: onTap,
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+  void _showGameCompletedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFFFF5C1), Color(0xFFFFDD9E)],
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (gameWon)
+                    Text(
+                      '🎉 Great Job! 🎉',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFFF6B6B),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  const SizedBox(height: 15),
+                  if (gameWon)
+                    const Text(
+                      'You matched all the animals!',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Color(0xFF333333),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  const SizedBox(height: 15),
+                  _buildStarsRow(size: 36, spacing: 8),
+                  const SizedBox(height: 10),
+                  if (gameWon)
+                    const Text(
+                      'You can now tap any animal to learn more!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF333333),
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (gameWon)
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            'Continue Playing',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2E3192),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _restartGame();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFAAFFE5),
+                          foregroundColor: Color(0xFF40196D),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: const Text(
+                          'Play Again',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
+  int get _starCount =>
+      wrongTries == 0
+          ? 3
+          : wrongTries == 1
+          ? 2
+          : wrongTries == 2
+          ? 1
+          : 0;
+
+  Widget _buildStarsRow({double size = 20, double spacing = 4}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(3, (i) {
+        final consumed = i < wrongTries; // strike off consumed attempts
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Icon(
+                Icons.star,
+                color: consumed ? Colors.grey : const Color(0xFFFFC107),
+                size: size,
+              ),
+              if (consumed)
+                Transform.rotate(
+                  angle: 0.78539816339, // 45 degrees
+                  child: Container(
+                    width: size * 1.2,
+                    height: 2,
+                    color: Colors.redAccent,
+                  ),
+                ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  void _restartGame() {
+    setState(() {
+      cards = [];
+      selectedIndices.clear();
+      matchesFound = 0;
+      wrongTries = 0;
+      gameCompleted = false;
+      gameWon = false;
+    });
+    _initializeGame();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        title: const Text(
+          'Brain Challenger',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: Colors.white,
+            letterSpacing: 1.0,
+          ),
+        ),
+        backgroundColor: Color(0xFF40196D),
+        elevation: 0,
+        actions: [
+          // Language toggle with emoji + label
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0),
+            child: TextButton.icon(
+              onPressed: () {
+                setState(() => isSpanish = !isSpanish);
+                _setLanguage();
+              },
+              icon: Text(
+                isSpanish ? '🇪🇸' : '🇬🇧',
+                style: const TextStyle(fontSize: 18),
+              ),
+              label: Text(
+                isSpanish ? 'Español' : 'English',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ),
+          // Speaker toggle
+          IconButton(
+            tooltip: soundEnabled ? 'Mute' : 'Unmute',
+            onPressed: () async {
+              setState(() => soundEnabled = !soundEnabled);
+              if (soundEnabled) {
+                await _setLanguage();
+              } else {
+                await _sfxPlayer.stop();
+                await flutterTts.stop();
+              }
+            },
+            icon: Icon(
+              soundEnabled ? Icons.volume_up : Icons.volume_off,
+              color: Colors.white,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: _buildStarsRow(size: 22, spacing: 4),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          // Background image
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/background.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          // Semi-transparent overlay for better readability
+          Container(color: Colors.white.withOpacity(0.7)),
+          // Peek countdown overlay
+          if (isPeeking) ...[
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: true,
+                child: Container(
+                  color: Colors.black.withOpacity(0.2),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: 110,
+                                height: 110,
+                                child: CircularProgressIndicator(
+                                  value: 1 - (_peekSecondsRemaining / _peekTotalSeconds),
+                                  strokeWidth: 8,
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF40196D)),
+                                  backgroundColor: const Color(0xFFAAFFE5),
+                                ),
+                              ),
+                              Text(
+                                _peekSecondsRemaining > 0 ? '$_peekSecondsRemaining' : 'Go!',
+                                style: const TextStyle(
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF40196D),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Flip and Match',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF2E3192),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Builder(\n                                                        builder: (_) {\n                                                          final display = _nameForDisplay((card['name'] ?? '').toString());\n                                                          return Text(\n                                                            display,\n                                                            style: TextStyle(\n                                                              fontSize: display.length > 5 ? 16 : 20,\n                                                              fontWeight: FontWeight.bold,\n                                                              color: const Color(0xFF40196D),\n                                                            ),\n                                                            textAlign: TextAlign.center,\n                                                          );\n                                                        },\n                                                      ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Card grid with container for better visibility
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.green.shade200,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          const crossAxisSpacing = 6.0;
+                          const mainAxisSpacing = 6.0;
+                          final totalWidth = constraints.maxWidth;
+                          final totalHeight = constraints.maxHeight;
+                          final tileWidth =
+                              (totalWidth -
+                                  (crossAxisSpacing * (_gridColumns - 1))) /
+                              _gridColumns;
+                          final tileHeight =
+                              (totalHeight -
+                                  (mainAxisSpacing * (_gridRows - 1))) /
+                              _gridRows;
+                          final aspect = tileWidth / tileHeight;
+                          return GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: _gridColumns,
+                                  crossAxisSpacing: crossAxisSpacing,
+                                  mainAxisSpacing: mainAxisSpacing,
+                                  childAspectRatio: aspect,
+                                ),
+                            itemCount: cards.length,
+                            itemBuilder: (context, index) {
+                              final card = cards[index];
+                              return GestureDetector(
+                                onTap: () => _onCardTap(index),
+                                child: Card(
+                                  elevation: card['matched'] ? 0 : 2,
+                                  margin: EdgeInsets.zero,
+                                  shadowColor:
+                                      card['matched']
+                                          ? Color(0xFF4ECDC4).withOpacity(0.5)
+                                          : Colors.black.withOpacity(0.3),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: BorderSide(
+                                      color:
+                                          card['matched']
+                                              ? Color(0xFFAAFFE5)
+                                              : Colors.transparent,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  color:
+                                      card['matched']
+                                          ? Color(
+                                            0xFFAAFFE5,
+                                          ) // Aqua mint for matched cards
+                                          : Color(
+                                            0xFFFF87AB,
+                                          ), // Soft pink for unmatched cards
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        if (card['revealed'] &&
+                                            !card['matched'])
+                                          BoxShadow(
+                                            color: Color(
+                                              0xFFAAFFE5,
+                                            ).withOpacity(0.3),
+                                            blurRadius: 8,
+                                            spreadRadius: 1,
+                                          ),
+                                      ],
+                                    ),
+                                    child:
+                                        card['revealed'] || card['matched']
+                                            ? (card['type'] == 'image'
+                                                ? Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    4.0,
+                                                  ),
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          6,
+                                                        ),
+                                                    child: Image.asset(
+                                                      card['image'],
+                                                      fit: BoxFit.cover,
+                                                      height: 50,
+                                                      width: 50,
+                                                    ),
+                                                  ),
+                                                )
+                                                : Center(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          2.0,
+                                                        ),
+                                                    child: FittedBox(
+                                                      fit: BoxFit.scaleDown,
+                                                      child: Builder(\n                                                        builder: (_) {\n                                                          final display = _nameForDisplay((card['name'] ?? '').toString());\n                                                          return Text(\n                                                            display,\n                                                            style: TextStyle(\n                                                              fontSize: display.length > 5 ? 16 : 20,\n                                                              fontWeight: FontWeight.bold,\n                                                              color: const Color(0xFF40196D),\n                                                            ),\n                                                            textAlign: TextAlign.center,\n                                                          );\n                                                        },\n                                                      ),
+                                                    ),
+                                                  ),
+                                                ))
+                                            : Container(
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFFFF87AB),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: const Center(
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(2.0),
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Builder(\n                                                        builder: (_) {\n                                                          final display = _nameForDisplay((card['name'] ?? '').toString());\n                                                          return Text(\n                                                            display,\n                                                            style: TextStyle(\n                                                              fontSize: display.length > 5 ? 16 : 20,\n                                                              fontWeight: FontWeight.bold,\n                                                              color: const Color(0xFF40196D),\n                                                            ),\n                                                            textAlign: TextAlign.center,\n                                                          );\n                                                        },\n                                                      ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+
+
+
