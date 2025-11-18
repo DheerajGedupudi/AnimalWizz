@@ -1,0 +1,41 @@
+name: my_flutter_app
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_tts: ^3.8.3
+  animate_do: ^2.1.0
+  flutter_animate: ^4.2.0
+  confetti: ^0.7.0
+  audioplayers: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/quiz_background.png
+    - assets/images/baloon.png
+    - assets/sounds/correct.mp3
+    - assets/sounds/wrong.mp3
+    - assets/images/egg.jpg
+    - assets/images/caterpillar.jpg
+    - assets/images/chrysalis.jpg
+    - assets/images/butterfly.png
+    - assets/images/elephant.png
+    - assets/images/sheep.png
+    - assets/images/kangaroo.jpg
+    - assets/images/cat.jpg
