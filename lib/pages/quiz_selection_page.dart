@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'quiz_page.dart';
 import 'habitat_game_page.dart';
 import 'animal_word_puzzle_page.dart';
+import 'feed_animal_game.dart';
 
 class QuizSelectionPage extends StatelessWidget {
   const QuizSelectionPage({super.key});
@@ -43,6 +44,12 @@ class QuizSelectionPage extends StatelessWidget {
         'image': 'assets/images/foodchain.png',
         'color': Colors.purple,
         'icon': Icons.restaurant,
+      },
+      {
+        'title': 'Feed Animals',
+        'image': 'assets/images/elephant.jpg',
+        'color': Colors.pink,
+        'icon': Icons.fastfood,
       },
     ];
 
@@ -135,6 +142,13 @@ class QuizSelectionPage extends StatelessWidget {
                                 ),
                               ),
                             );
+                            } else if (section['title'] == 'Feed Animals') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const FeedHungryAnimalGamePage(),
+                                ),
+                              );
                           } else {
                             Navigator.push(
                               context,

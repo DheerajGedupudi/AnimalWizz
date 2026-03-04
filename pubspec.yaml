@@ -31,6 +31,7 @@ flutter:
     - assets/images/baloon.png
     - assets/sounds/correct.mp3
     - assets/sounds/wrong.mp3
+    - assets/sounds/
     - assets/images/egg.jpg
     - assets/images/caterpillar.jpg
     - assets/images/chrysalis.jpg
