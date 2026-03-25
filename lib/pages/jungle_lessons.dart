@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'memory_game_page.dart';
-import 'desert_game_page.dart';
-import 'forest_game_page.dart';
-import 'arctic_game_page.dart';
-import 'ocean_game_page.dart';
+import 'habitat_page.dart';
 import 'food_chain_game_page.dart';
 import 'life_cycles_game_page.dart';
 import '../widgets/subtopic_card.dart';
@@ -221,7 +218,7 @@ class _JungleLessonsPageState extends State<JungleLessonsPage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const DesertAnimalsApp()),
+                MaterialPageRoute(builder: (_) => const HabitatPage(config: desertConfig)),
               );
             },
             child: Container(
@@ -385,13 +382,13 @@ class _JungleLessonsPageState extends State<JungleLessonsPage> {
       onTap: () {
         Widget destination;
         if (title == "Desert") {
-          destination = const DesertAnimalsApp();
+          destination = const HabitatPage(config: desertConfig);
         } else if (title == "Forest") {
-          destination = const ForestAnimalsApp();
+          destination = const HabitatPage(config: forestConfig);
         } else if (title == "Ocean") {
-          destination = const OceanAnimalsApp();
+          destination = const HabitatPage(config: oceanConfig);
         } else if (title == "Arctic") {
-          destination = const ArcticAnimalsApp();
+          destination = const HabitatPage(config: arcticConfig);
         } else {
           ScaffoldMessenger.of(
             context,
