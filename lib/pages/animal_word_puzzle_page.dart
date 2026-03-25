@@ -3,11 +3,9 @@ import 'package:flutter/services.dart';
 
 class AnimalWordPuzzlePage extends StatefulWidget {
   final String sectionName;
-  
-  const AnimalWordPuzzlePage({
-    Key? key,
-    required this.sectionName,
-  }) : super(key: key);
+
+  const AnimalWordPuzzlePage({Key? key, required this.sectionName})
+    : super(key: key);
 
   @override
   State<AnimalWordPuzzlePage> createState() => _AnimalWordPuzzlePageState();
@@ -59,7 +57,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
   int score = 0;
   bool hasShownDialog = false;
   bool showSpanish = false;
-  
+
   final Map<int, String> animalImages = {
     1: 'assets/images/elephant.jpg',
     2: 'assets/images/sheep.png',
@@ -72,25 +70,25 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
       'id': 1,
       'text': '1. I am the largest land animal with a long trunk.',
       'spanish': '1. Soy el animal terrestre más grande con una trompa larga',
-      'direction': 'down'
+      'direction': 'down',
     },
     {
       'id': 2,
       'text': '2. I have woolly fur and say baa.',
       'spanish': '2. Tengo pelaje lanudo y digo bee',
-      'direction': 'across'
+      'direction': 'across',
     },
     {
       'id': 3,
       'text': '3. I hop and carry my baby in a pouch.',
       'spanish': '3. Salto y llevo a mi bebé en una bolsa',
-      'direction': 'across'
+      'direction': 'across',
     },
     {
       'id': 4,
       'text': '4. I am a furry pet that says meow.',
       'spanish': '4. Soy una mascota peluda que dice miau',
-      'direction': 'across'
+      'direction': 'across',
     },
   ];
 
@@ -103,7 +101,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
       PuzzleWord(id: 3, word: 'KANGAROO', direction: 'across', row: 5, col: 1),
       PuzzleWord(id: 4, word: 'CAT', direction: 'across', row: 7, col: 0),
     ];
-    
+
     buildGrid();
   }
 
@@ -119,10 +117,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
   }
 
   void buildGrid() {
-    grid = List.generate(
-      8,
-      (_) => List.generate(9, (_) => null),
-    );
+    grid = List.generate(8, (_) => List.generate(9, (_) => null));
 
     for (var word in words) {
       for (int i = 0; i < word.word.length; i++) {
@@ -142,7 +137,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
         } else {
           grid[r][c]!.correct = correct;
         }
-        
+
         if (i == 0) {
           grid[r][c]!.number = word.id;
         }
@@ -152,10 +147,10 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
 
   void handleCellInput(int row, int col, String value) {
     if (value.isEmpty || grid[row][col] == null) return;
-    
+
     final cell = grid[row][col]!;
     final inputLetter = value.toUpperCase();
-    
+
     if (inputLetter == cell.correct) {
       // Correct answer - keep it and move to next
       setState(() {
@@ -174,7 +169,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
         cell.letter = inputLetter;
         cell.showingWrong = true;
       });
-      
+
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           setState(() {
@@ -192,10 +187,16 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
   void moveToNextCell(int row, int col) {
     PuzzleWord? currentWord;
     for (var word in words) {
-      if (word.direction == 'across' && word.row == row && col >= word.col && col < word.col + word.word.length) {
+      if (word.direction == 'across' &&
+          word.row == row &&
+          col >= word.col &&
+          col < word.col + word.word.length) {
         currentWord = word;
         break;
-      } else if (word.direction == 'down' && word.col == col && row >= word.row && row < word.row + word.word.length) {
+      } else if (word.direction == 'down' &&
+          word.col == col &&
+          row >= word.row &&
+          row < word.row + word.word.length) {
         currentWord = word;
         break;
       }
@@ -204,7 +205,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
     if (currentWord != null) {
       int nextRow = row;
       int nextCol = col;
-      
+
       if (currentWord.direction == 'across') {
         nextCol++;
         if (nextCol >= currentWord.col + currentWord.word.length) return;
@@ -212,8 +213,10 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
         nextRow++;
         if (nextRow >= currentWord.row + currentWord.word.length) return;
       }
-      
-      if (nextRow < grid.length && nextCol < grid[0].length && grid[nextRow][nextCol] != null) {
+
+      if (nextRow < grid.length &&
+          nextCol < grid[0].length &&
+          grid[nextRow][nextCol] != null) {
         grid[nextRow][nextCol]!.focusNode?.requestFocus();
       }
     }
@@ -235,7 +238,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
   void checkCompletion() {
     if (allCorrect && !hasShownDialog) {
       hasShownDialog = true;
-      
+
       int correctCount = 0;
       for (var row in grid) {
         for (var cell in row) {
@@ -245,7 +248,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
         }
       }
       score = correctCount * 10;
-      
+
       Future.delayed(const Duration(milliseconds: 500), () {
         _showCompletionDialog();
       });
@@ -286,12 +289,13 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 0.8,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 0.8,
+                        ),
                     itemCount: questions.length,
                     itemBuilder: (context, index) {
                       final question = questions[index];
@@ -442,7 +446,8 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     final isTablet = screenWidth > 600;
 
     return Scaffold(
@@ -451,10 +456,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFFEDD5),
-              Color(0xFFFED7AA),
-            ],
+            colors: [Color(0xFFFFEDD5), Color(0xFFFED7AA)],
           ),
         ),
         child: SafeArea(
@@ -462,13 +464,19 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: isTablet ? screenWidth * 0.05 : screenWidth * 0.03,
-                  vertical: isLandscape ? screenHeight * 0.02 : screenHeight * 0.02,
+                  horizontal:
+                      isTablet ? screenWidth * 0.05 : screenWidth * 0.03,
+                  vertical:
+                      isLandscape ? screenHeight * 0.02 : screenHeight * 0.02,
                 ),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.orange, size: 30),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.orange,
+                        size: 30,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
@@ -503,7 +511,8 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isTablet ? screenWidth * 0.05 : screenWidth * 0.03,
+                    horizontal:
+                        isTablet ? screenWidth * 0.05 : screenWidth * 0.03,
                   ),
                   child: Column(
                     children: [
@@ -519,10 +528,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
                               offset: const Offset(0, 5),
                             ),
                           ],
-                          border: Border.all(
-                            color: Colors.orange,
-                            width: 3,
-                          ),
+                          border: Border.all(color: Colors.orange, width: 3),
                         ),
                         padding: EdgeInsets.all(isTablet ? 24 : 16),
                         child: Column(
@@ -536,95 +542,117 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
                                     grid.length,
                                     (i) => Row(
                                       mainAxisSize: MainAxisSize.min,
-                                      children: List.generate(
-                                        grid[i].length,
-                                        (j) {
-                                          GridCell? cell = grid[i][j];
-                                          double cellSize = isTablet ? 55 : 42;
+                                      children: List.generate(grid[i].length, (
+                                        j,
+                                      ) {
+                                        GridCell? cell = grid[i][j];
+                                        double cellSize = isTablet ? 55 : 42;
 
-                                          if (cell == null || !cell.isActive) {
-                                            return Container(
-                                              width: cellSize,
-                                              height: cellSize,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey.shade200,
-                                                border: Border.all(
-                                                  color: Colors.grey.shade400,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                            );
-                                          }
-
+                                        if (cell == null || !cell.isActive) {
                                           return Container(
                                             width: cellSize,
                                             height: cellSize,
                                             decoration: BoxDecoration(
-                                              color: cell.showingWrong
-                                                  ? Colors.red.shade100
-                                                  : (cell.letter.isNotEmpty && cell.isCorrect
-                                                      ? Colors.green.shade100
-                                                      : Colors.white),
+                                              color: Colors.grey.shade200,
                                               border: Border.all(
-                                                color: cell.showingWrong
-                                                    ? Colors.red.shade400
-                                                    : Colors.orange.shade300,
-                                                width: 1.5,
+                                                color: Colors.grey.shade400,
+                                                width: 1,
                                               ),
                                             ),
-                                            child: Stack(
-                                              children: [
-                                                if (cell.number != null)
-                                                  Positioned(
-                                                    top: 2,
-                                                    left: 2,
-                                                    child: Text(
-                                                      '${cell.number}',
-                                                      style: TextStyle(
-                                                        fontSize: isTablet ? 11 : 9,
-                                                        color: Colors.orange.shade700,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                Center(
-                                                  child: TextField(
-                                                    key: ValueKey('${i}_${j}'),
-                                                    controller: cell.controller,
-                                                    focusNode: cell.focusNode,
-                                                    textAlign: TextAlign.center,
-                                                    maxLength: 1,
+                                          );
+                                        }
+
+                                        return Container(
+                                          width: cellSize,
+                                          height: cellSize,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                cell.showingWrong
+                                                    ? Colors.red.shade100
+                                                    : (cell.letter.isNotEmpty &&
+                                                            cell.isCorrect
+                                                        ? Colors.green.shade100
+                                                        : Colors.white),
+                                            border: Border.all(
+                                              color:
+                                                  cell.showingWrong
+                                                      ? Colors.red.shade400
+                                                      : Colors.orange.shade300,
+                                              width: 1.5,
+                                            ),
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              if (cell.number != null)
+                                                Positioned(
+                                                  top: 2,
+                                                  left: 2,
+                                                  child: Text(
+                                                    '${cell.number}',
                                                     style: TextStyle(
-                                                      fontSize: isTablet ? 24 : 20,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: cell.showingWrong
-                                                          ? Colors.red.shade700
-                                                          : Colors.orange.shade900,
+                                                      fontSize:
+                                                          isTablet ? 11 : 9,
+                                                      color:
+                                                          Colors
+                                                              .orange
+                                                              .shade700,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
-                                                    decoration: const InputDecoration(
-                                                      border: InputBorder.none,
-                                                      counterText: '',
-                                                      contentPadding: EdgeInsets.zero,
-                                                    ),
-                                                    inputFormatters: [
-                                                      LengthLimitingTextInputFormatter(1),
-                                                      FilteringTextInputFormatter.allow(
-                                                        RegExp('[a-zA-Z]'),
-                                                      ),
-                                                      UpperCaseTextFormatter(),
-                                                    ],
-                                                    onChanged: (value) {
-                                                      if (value.isNotEmpty) {
-                                                        handleCellInput(i, j, value);
-                                                      }
-                                                    },
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                              Center(
+                                                child: TextField(
+                                                  key: ValueKey('${i}_${j}'),
+                                                  controller: cell.controller,
+                                                  focusNode: cell.focusNode,
+                                                  textAlign: TextAlign.center,
+                                                  maxLength: 1,
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        isTablet ? 24 : 20,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        cell.showingWrong
+                                                            ? Colors
+                                                                .red
+                                                                .shade700
+                                                            : Colors
+                                                                .orange
+                                                                .shade900,
+                                                  ),
+                                                  decoration:
+                                                      const InputDecoration(
+                                                        border:
+                                                            InputBorder.none,
+                                                        counterText: '',
+                                                        contentPadding:
+                                                            EdgeInsets.zero,
+                                                      ),
+                                                  inputFormatters: [
+                                                    LengthLimitingTextInputFormatter(
+                                                      1,
+                                                    ),
+                                                    FilteringTextInputFormatter.allow(
+                                                      RegExp('[a-zA-Z]'),
+                                                    ),
+                                                    UpperCaseTextFormatter(),
+                                                  ],
+                                                  onChanged: (value) {
+                                                    if (value.isNotEmpty) {
+                                                      handleCellInput(
+                                                        i,
+                                                        j,
+                                                        value,
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }),
                                     ),
                                   ),
                                 ),
@@ -657,7 +685,12 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
                         ),
                       ),
 
-                      SizedBox(height: isLandscape ? screenHeight * 0.02 : screenHeight * 0.03),
+                      SizedBox(
+                        height:
+                            isLandscape
+                                ? screenHeight * 0.02
+                                : screenHeight * 0.03,
+                      ),
 
                       Container(
                         decoration: BoxDecoration(
@@ -671,10 +704,7 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
                               offset: const Offset(0, 5),
                             ),
                           ],
-                          border: Border.all(
-                            color: Colors.orange,
-                            width: 3,
-                          ),
+                          border: Border.all(color: Colors.orange, width: 3),
                         ),
                         padding: EdgeInsets.all(isTablet ? 24 : 16),
                         child: Column(
@@ -697,7 +727,10 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
                                       'English',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight: showSpanish ? FontWeight.normal : FontWeight.bold,
+                                        fontWeight:
+                                            showSpanish
+                                                ? FontWeight.normal
+                                                : FontWeight.bold,
                                         color: Colors.grey.shade700,
                                       ),
                                     ),
@@ -714,7 +747,10 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
                                       'Español',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight: showSpanish ? FontWeight.bold : FontWeight.normal,
+                                        fontWeight:
+                                            showSpanish
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
                                         color: Colors.grey.shade700,
                                       ),
                                     ),
@@ -741,7 +777,12 @@ class _AnimalWordPuzzlePageState extends State<AnimalWordPuzzlePage> {
                         ),
                       ),
 
-                      SizedBox(height: isLandscape ? screenHeight * 0.02 : screenHeight * 0.03),
+                      SizedBox(
+                        height:
+                            isLandscape
+                                ? screenHeight * 0.02
+                                : screenHeight * 0.03,
+                      ),
                     ],
                   ),
                 ),
