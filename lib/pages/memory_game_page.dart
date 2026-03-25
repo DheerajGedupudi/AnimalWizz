@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../data/animals.dart';
+import '../models/animal.dart';
 
 class MemoryGamePage extends StatefulWidget {
   final String lessonTitle;
@@ -23,48 +24,14 @@ class MemoryGamePage extends StatefulWidget {
 }
 
 class _MemoryGamePageState extends State<MemoryGamePage> {
-  // Spanish translations for display and TTS (extend as needed)
-  static const Map<String, String> _spanishNames = {
-    'Horse': 'Caballo',
-    'Deer': 'Ciervo',
-    'Zebra': 'Cebra',
-    'Elephant': 'Elefante',
-    'Lion': 'León',
-    'Tiger': 'Tigre',
-    'Cheetah': 'Guepardo',
-    'Wolf': 'Lobo',
-    'Fox': 'Zorro',
-    'Bear': 'Oso',
-    'Pig': 'Cerdo',
-    'Chimpanzee': 'Chimpancé',
-    'Toucan': 'Tucán',
-    'Jaguar': 'Jaguar',
-    'Sloth': 'Perezoso',
-    'Poison Dart Frog': 'Rana venenosa',
-    'Camel': 'Camello',
-    'Fennec Fox': 'Zorro del desierto',
-    'Meerkat': 'Suricata',
-    'Gila Monster': 'Monstruo de Gila',
-    'Polar Bear': 'Oso polar',
-    'Arctic Fox': 'Zorro ártico',
-    'Walrus': 'Morsa',
-    'Harp Seal': 'Foca de Groenlandia',
-    'Reindeer': 'Reno',
-    'Snowy Owl': 'Búho nival',
-    'Dolphin': 'Delfín',
-    'Shark': 'Tiburón',
-    'Octopus': 'Pulpo',
-    'Jellyfish': 'Medusa',
-    'Clownfish': 'Pez payaso',
-    'Sea Turtle': 'Tortuga marina',
-    'Eagle': 'Águila',
-    'Hawk': 'Halcón',
-    'Woodpecker': 'Pájaro carpintero',
-    'Squirrel': 'Ardilla',
-  };
-
-  String _nameForDisplay(String englishName) =>
-      isSpanish ? (_spanishNames[englishName] ?? englishName) : englishName;
+  String _nameForDisplay(String englishName) {
+    if (!isSpanish) return englishName;
+    final animal = allAnimals.cast<Animal?>().firstWhere(
+      (a) => a!.name == englishName,
+      orElse: () => null,
+    );
+    return animal?.nameEs ?? englishName;
+  }
 
   // Core state
   List<Map<String, dynamic>> cards = [];
@@ -96,7 +63,7 @@ class _MemoryGamePageState extends State<MemoryGamePage> {
   Timer? _peekTimer;
 
   // Data
-  late List<Map<String, dynamic>> animalInfo;
+  late List<Animal> animalPool;
 
   @override
   void initState() {
@@ -107,14 +74,9 @@ class _MemoryGamePageState extends State<MemoryGamePage> {
     // Filter by category (lessonTitle) or use all animals (including "All Animals").
     final category = widget.lessonTitle;
     if (category == 'All Animals' || category.isEmpty) {
-      animalInfo =
-          kAllAnimals.map((e) => Map<String, dynamic>.from(e)).toList();
+      animalPool = List<Animal>.from(allAnimals);
     } else {
-      animalInfo =
-          kAllAnimals
-              .where((a) => (a['category'] ?? '') == category)
-              .map((a) => Map<String, dynamic>.from(a))
-              .toList();
+      animalPool = animalsForCategory(category);
     }
     _initTts();
     // Choose difficulty first
@@ -266,15 +228,13 @@ class _MemoryGamePageState extends State<MemoryGamePage> {
   // Game setup
   void _initializeGame() {
     // Build pool from selected category or all
-    final List<Map<String, dynamic>> pool =
-        animalInfo.isNotEmpty
-            ? List<Map<String, dynamic>>.from(animalInfo)
-            : kAllAnimals.map((e) => Map<String, dynamic>.from(e)).toList();
+    final List<Animal> pool =
+        animalPool.isNotEmpty ? List<Animal>.from(animalPool) : List<Animal>.from(allAnimals);
 
     // Pick unique animals
     final rnd = Random();
     final Set<int> chosen = {};
-    final List<Map<String, dynamic>> chosenAnimals = [];
+    final List<Animal> chosenAnimals = [];
     while (chosenAnimals.length < _pairsCount && chosen.length < pool.length) {
       final i = rnd.nextInt(pool.length);
       if (chosen.add(i)) chosenAnimals.add(pool[i]);
@@ -285,15 +245,15 @@ class _MemoryGamePageState extends State<MemoryGamePage> {
     for (final a in chosenAnimals) {
       nextCards.add({
         'type': 'image',
-        'image': a['image'],
-        'name': a['name'],
+        'image': a.image,
+        'name': a.name,
         'revealed': false,
         'matched': false,
         'info': a,
       });
       nextCards.add({
         'type': 'text',
-        'name': a['name'],
+        'name': a.name,
         'revealed': false,
         'matched': false,
         'info': a,

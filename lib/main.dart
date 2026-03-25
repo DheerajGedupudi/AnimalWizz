@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pages/jungle_lessons.dart';
 import 'pages/quiz_selection_page.dart';
-import 'pages/desert_game_page.dart';
-import 'pages/forest_game_page.dart';
-import 'pages/arctic_game_page.dart';
-import 'pages/ocean_game_page.dart';
+import 'pages/habitat_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -24,10 +21,10 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const JungleMainPage(),
-        '/desert': (context) => const DesertAnimalsApp(),
-        '/forest': (context) => const ForestAnimalsApp(),
-        '/arctic': (context) => const ArcticAnimalsApp(),
-        '/ocean': (context) => const OceanAnimalsApp(),
+        '/desert': (context) => const HabitatPage(config: desertConfig),
+        '/forest': (context) => const HabitatPage(config: forestConfig),
+        '/arctic': (context) => const HabitatPage(config: arcticConfig),
+        '/ocean': (context) => const HabitatPage(config: oceanConfig),
       },
     );
   }

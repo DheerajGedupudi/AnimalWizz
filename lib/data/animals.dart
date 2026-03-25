@@ -1,238 +1,360 @@
-// lib/data/animals.dart
-// Centralized animal data used by the memory game (and others).
-// Add new animals here; reference existing assets in assets/images.
+import '../models/animal.dart';
 
-const List<Map<String, String>> kAllAnimals = [
-  // Herbivores
-  {
-    'name': 'Horse',
-    'image': 'assets/images/horse.jpg',
-    'description': 'Horses can sleep standing up and run fast.',
-    'category': 'Herbivores',
-  },
-  {
-    'name': 'Deer',
-    'image': 'assets/images/deer.jpg',
-    'description': 'Deer are swift herbivores with great hearing.',
-    'category': 'Herbivores',
-  },
-  {
-    'name': 'Zebra',
-    'image': 'assets/images/zebra.jpg',
-    'description': 'Zebras have unique black and white stripes.',
-    'category': 'Herbivores',
-  },
-  {
-    'name': 'Elephant',
-    'image': 'assets/images/elephant.jpg',
-    'description': 'Elephants are intelligent giants with strong trunks.',
-    'category': 'Herbivores',
-  },
+/// Central animal data for the entire app.
+/// - [category]: used by memory game to filter (Herbivores, Carnivores, etc.)
+/// - [habitat]: used by habitat pages to filter (Desert, Forest, Arctic, Ocean)
+/// Some animals have both (e.g., Bear is Omnivores category, Forest habitat).
 
-  // Carnivores
-  {
-    'name': 'Lion',
-    'image': 'assets/images/lion.jpg',
-    'description': 'Lions live in prides and are powerful hunters.',
-    'category': 'Carnivores',
-  },
-  {
-    'name': 'Tiger',
-    'image': 'assets/images/tiger.jpg',
-    'description': 'Tigers have bold stripes and hunt alone.',
-    'category': 'Carnivores',
-  },
-  {
-    'name': 'Cheetah',
-    'image': 'assets/images/cheetah.jpg',
-    'description': 'Cheetahs are the fastest land animals.',
-    'category': 'Carnivores',
-  },
-  {
-    'name': 'Wolf',
-    'image': 'assets/images/wolf.jpg',
-    'description': 'Wolves hunt in packs and communicate by howling.',
-    'category': 'Carnivores',
-  },
-  {
-    'name': 'Fox',
-    'image': 'assets/images/fox.jpg',
-    'description': 'Foxes are clever hunters with bushy tails.',
-    'category': 'Carnivores',
-  },
+const List<Animal> allAnimals = [
+  // ── Herbivores ──
+  Animal(
+    name: 'Horse',
+    nameEs: 'Caballo',
+    image: 'assets/images/horse.jpg',
+    description: 'Horses can sleep standing up and run fast.',
+    descriptionEs: 'Los caballos pueden dormir de pie y correr rápido.',
+    category: 'Herbivores',
+  ),
+  Animal(
+    name: 'Deer',
+    nameEs: 'Ciervo',
+    image: 'assets/images/deer.jpg',
+    description: 'Deer are graceful forest animals known for their antlers and speed.',
+    descriptionEs: 'Los ciervos son animales gráciles del bosque conocidos por sus astas y velocidad.',
+    category: 'Herbivores',
+    habitat: 'Forest',
+  ),
+  Animal(
+    name: 'Zebra',
+    nameEs: 'Cebra',
+    image: 'assets/images/zebra.jpg',
+    description: 'Zebras have unique black and white stripes.',
+    descriptionEs: 'Las cebras tienen rayas únicas en blanco y negro.',
+    category: 'Herbivores',
+  ),
+  Animal(
+    name: 'Elephant',
+    nameEs: 'Elefante',
+    image: 'assets/images/elephant.jpg',
+    description: 'Elephants are intelligent giants with strong trunks.',
+    descriptionEs: 'Los elefantes son gigantes inteligentes con trompas fuertes.',
+    category: 'Herbivores',
+  ),
 
-  // Omnivores
-  {
-    'name': 'Bear',
-    'image': 'assets/images/bear.jpg',
-    'description': 'Bears eat plants, insects, and fish.',
-    'category': 'Omnivores',
-  },
-  {
-    'name': 'Pig',
-    'image': 'assets/images/pig.jpg',
-    'description': 'Pigs are smart omnivores with a strong sense of smell.',
-    'category': 'Omnivores',
-  },
-  {
-    'name': 'Chimpanzee',
-    'image': 'assets/images/chimpanzee.jpg',
-    'description': 'Chimpanzees use tools and live in social groups.',
-    'category': 'Omnivores',
-  },
+  // ── Carnivores ──
+  Animal(
+    name: 'Lion',
+    nameEs: 'León',
+    image: 'assets/images/lion.jpg',
+    description: 'Lions live in prides and are powerful hunters.',
+    descriptionEs: 'Los leones viven en manadas y son cazadores poderosos.',
+    category: 'Carnivores',
+  ),
+  Animal(
+    name: 'Tiger',
+    nameEs: 'Tigre',
+    image: 'assets/images/tiger.jpg',
+    description: 'Tigers have bold stripes and hunt alone.',
+    descriptionEs: 'Los tigres tienen rayas llamativas y cazan solos.',
+    category: 'Carnivores',
+  ),
+  Animal(
+    name: 'Cheetah',
+    nameEs: 'Guepardo',
+    image: 'assets/images/cheetah.jpg',
+    description: 'Cheetahs are the fastest land animals.',
+    descriptionEs: 'Los guepardos son los animales terrestres más rápidos.',
+    category: 'Carnivores',
+  ),
+  Animal(
+    name: 'Wolf',
+    nameEs: 'Lobo',
+    image: 'assets/images/wolf.jpg',
+    description: 'Wolves hunt in packs and communicate by howling.',
+    descriptionEs: 'Los lobos cazan en manadas y se comunican aullando.',
+    category: 'Carnivores',
+  ),
+  Animal(
+    name: 'Fox',
+    nameEs: 'Zorro',
+    image: 'assets/images/fox.jpg',
+    description: 'Foxes are clever forest hunters with sharp hearing.',
+    descriptionEs: 'Los zorros son astutos cazadores del bosque con audición aguda.',
+    category: 'Carnivores',
+    habitat: 'Forest',
+  ),
 
-  // Rainforest
-  {
-    'name': 'Toucan',
-    'image': 'assets/images/toucan.jpg',
-    'description': 'Toucans have colorful beaks and eat fruit.',
-    'category': 'Rainforest',
-  },
-  {
-    'name': 'Jaguar',
-    'image': 'assets/images/jaguar.jpg',
-    'description': 'Jaguars are strong swimmers and stealthy predators.',
-    'category': 'Rainforest',
-  },
-  {
-    'name': 'Sloth',
-    'image': 'assets/images/sloth.jpg',
-    'description': 'Sloths move slowly and hang from trees.',
-    'category': 'Rainforest',
-  },
-  {
-    'name': 'Poison Dart Frog',
-    'image': 'assets/images/poison_frog.jpg',
-    'description': 'Tiny, brightly colored, and toxic to predators.',
-    'category': 'Rainforest',
-  },
+  // ── Omnivores ──
+  Animal(
+    name: 'Bear',
+    nameEs: 'Oso',
+    image: 'assets/images/bear.jpg',
+    description: 'Bears hibernate during winter and have strong claws for catching food.',
+    descriptionEs: 'Los osos hibernan durante el invierno y tienen fuertes garras para atrapar comida.',
+    category: 'Omnivores',
+    habitat: 'Forest',
+  ),
+  Animal(
+    name: 'Pig',
+    nameEs: 'Cerdo',
+    image: 'assets/images/pig.jpg',
+    description: 'Pigs are smart omnivores with a strong sense of smell.',
+    descriptionEs: 'Los cerdos son omnívoros inteligentes con un fuerte sentido del olfato.',
+    category: 'Omnivores',
+  ),
+  Animal(
+    name: 'Chimpanzee',
+    nameEs: 'Chimpancé',
+    image: 'assets/images/chimpanzee.jpg',
+    description: 'Chimpanzees use tools and live in social groups.',
+    descriptionEs: 'Los chimpancés usan herramientas y viven en grupos sociales.',
+    category: 'Omnivores',
+  ),
 
-  // Desert
-  {
-    'name': 'Camel',
-    'image': 'assets/images/camel.jpg',
-    'description': 'Camels store fat in their humps for energy.',
-    'category': 'Desert',
-  },
-  {
-    'name': 'Fennec Fox',
-    'image': 'assets/images/fennec.jpg',
-    'description': 'Fennec foxes have large ears to release heat.',
-    'category': 'Desert',
-  },
-  {
-    'name': 'Meerkat',
-    'image': 'assets/images/meerkat.jpg',
-    'description': 'Meerkats stand upright to watch for danger.',
-    'category': 'Desert',
-  },
-  {
-    'name': 'Gila Monster',
-    'image': 'assets/images/gila_monster.jpg',
-    'description': 'A venomous desert lizard that moves slowly.',
-    'category': 'Desert',
-  },
+  // ── Rainforest ──
+  Animal(
+    name: 'Toucan',
+    nameEs: 'Tucán',
+    image: 'assets/images/toucan.jpg',
+    description: 'Toucans have colorful beaks and eat fruit.',
+    descriptionEs: 'Los tucanes tienen picos coloridos y comen frutas.',
+    category: 'Rainforest',
+  ),
+  Animal(
+    name: 'Jaguar',
+    nameEs: 'Jaguar',
+    image: 'assets/images/jaguar.jpg',
+    description: 'Jaguars are strong swimmers and stealthy predators.',
+    descriptionEs: 'Los jaguares son grandes nadadores y depredadores sigilosos.',
+    category: 'Rainforest',
+  ),
+  Animal(
+    name: 'Sloth',
+    nameEs: 'Perezoso',
+    image: 'assets/images/sloth.jpg',
+    description: 'Sloths move slowly and hang from trees.',
+    descriptionEs: 'Los perezosos se mueven lentamente y cuelgan de los árboles.',
+    category: 'Rainforest',
+  ),
+  Animal(
+    name: 'Poison Dart Frog',
+    nameEs: 'Rana Venenosa',
+    image: 'assets/images/poison_frog.jpg',
+    description: 'Tiny, brightly colored, and toxic to predators.',
+    descriptionEs: 'Pequeñas, de colores brillantes y tóxicas para los depredadores.',
+    category: 'Rainforest',
+  ),
 
-  // Arctic
-  {
-    'name': 'Polar Bear',
-    'image': 'assets/images/polar_bear.jpg',
-    'description': 'Polar bears are strong swimmers on sea ice.',
-    'category': 'Arctic',
-  },
-  {
-    'name': 'Arctic Fox',
-    'image': 'assets/images/arctic_fox.jpg',
-    'description': 'Arctic foxes change fur color with the seasons.',
-    'category': 'Arctic',
-  },
-  {
-    'name': 'Walrus',
-    'image': 'assets/images/walrus.jpg',
-    'description': 'Walruses have long tusks and rest on ice floes.',
-    'category': 'Arctic',
-  },
-  {
-    'name': 'Harp Seal',
-    'image': 'assets/images/harp_seal.jpg',
-    'description': 'Harp seals are agile swimmers with white pups.',
-    'category': 'Arctic',
-  },
-  {
-    'name': 'Reindeer',
-    'image': 'assets/images/reindeer.jpg',
-    'description': 'Reindeer migrate long distances in herds.',
-    'category': 'Arctic',
-  },
-  {
-    'name': 'Snowy Owl',
-    'image': 'assets/images/snowy_owl.jpg',
-    'description': 'Snowy owls have white plumage and keen eyesight.',
-    'category': 'Arctic',
-  },
+  // ── Desert ──
+  Animal(
+    name: 'Camel',
+    nameEs: 'Camello',
+    image: 'assets/images/camel.jpg',
+    description: 'Camels store fat in their humps and can survive long periods without water.',
+    descriptionEs: 'Los camellos almacenan grasa en sus jorobas y pueden sobrevivir largos períodos sin agua.',
+    category: 'Desert',
+    habitat: 'Desert',
+  ),
+  Animal(
+    name: 'Fennec Fox',
+    nameEs: 'Zorro del Desierto',
+    image: 'assets/images/fennec.jpg',
+    description: 'Fennec foxes have large ears that help them stay cool in the hot desert.',
+    descriptionEs: 'Los zorros del desierto tienen orejas grandes que les ayudan a mantenerse frescos en el desierto caliente.',
+    category: 'Desert',
+    habitat: 'Desert',
+  ),
+  Animal(
+    name: 'Meerkat',
+    nameEs: 'Suricata',
+    image: 'assets/images/meerkat.jpg',
+    description: 'Meerkats live in groups and take turns watching for danger.',
+    descriptionEs: 'Los suricatas viven en grupos y se turnan para vigilar el peligro.',
+    category: 'Desert',
+    habitat: 'Desert',
+  ),
+  Animal(
+    name: 'Gila Monster',
+    nameEs: 'Monstruo de Gila',
+    image: 'assets/images/gila_monster.jpg',
+    description: 'The Gila monster is one of the few venomous lizards in the world.',
+    descriptionEs: 'El monstruo de Gila es uno de los pocos lagartos venenosos del mundo.',
+    category: 'Desert',
+    habitat: 'Desert',
+  ),
+  Animal(
+    name: 'Hawk',
+    nameEs: 'Halcón',
+    image: 'assets/images/hawk.png',
+    description: 'Desert hawks have excellent vision and can spot prey from high in the sky.',
+    descriptionEs: 'Los halcones del desierto tienen una excelente visión y pueden detectar presas desde lo alto del cielo.',
+    category: 'Forest',
+    habitat: 'Desert',
+  ),
+  Animal(
+    name: 'Desert Tortoise',
+    nameEs: 'Tortuga del Desierto',
+    image: 'assets/images/tortoise.png',
+    description: 'Desert tortoises can live for 50-80 years and dig burrows to escape the heat.',
+    descriptionEs: 'Las tortugas del desierto pueden vivir de 50 a 80 años y cavan madrigueras para escapar del calor.',
+    category: 'Desert',
+    habitat: 'Desert',
+  ),
 
-  // Ocean
-  {
-    'name': 'Dolphin',
-    'image': 'assets/images/dolphin.jpg',
-    'description': 'Dolphins are intelligent and communicate with clicks.',
-    'category': 'Ocean',
-  },
-  {
-    'name': 'Shark',
-    'image': 'assets/images/shark.jpg',
-    'description': 'Sharks are top ocean predators with sharp teeth.',
-    'category': 'Ocean',
-  },
-  {
-    'name': 'Octopus',
-    'image': 'assets/images/octopus.jpg',
-    'description': 'Octopuses are clever and can change color.',
-    'category': 'Ocean',
-  },
-  {
-    'name': 'Jellyfish',
-    'image': 'assets/images/jellyfish.jpg',
-    'description': 'Jellyfish drift and can give a sting.',
-    'category': 'Ocean',
-  },
-  {
-    'name': 'Clownfish',
-    'image': 'assets/images/clownfish.jpg',
-    'description': 'Clownfish live among anemone tentacles.',
-    'category': 'Ocean',
-  },
-  {
-    'name': 'Sea Turtle',
-    'image': 'assets/images/sea_turtle.jpg',
-    'description': 'Sea turtles travel long distances in the ocean.',
-    'category': 'Ocean',
-  },
+  // ── Arctic ──
+  Animal(
+    name: 'Polar Bear',
+    nameEs: 'Oso Polar',
+    image: 'assets/images/polar_bear.jpg',
+    description: 'Polar bears have thick fur and fat to survive in freezing temperatures.',
+    descriptionEs: 'Los osos polares tienen un pelaje grueso y grasa para sobrevivir en temperaturas heladas.',
+    category: 'Arctic',
+    habitat: 'Arctic',
+  ),
+  Animal(
+    name: 'Arctic Fox',
+    nameEs: 'Zorro Ártico',
+    image: 'assets/images/arctic_fox.jpg',
+    description: 'The Arctic fox changes its fur color with the seasons for camouflage.',
+    descriptionEs: 'El zorro ártico cambia el color de su pelaje con las estaciones para camuflarse.',
+    category: 'Arctic',
+    habitat: 'Arctic',
+  ),
+  Animal(
+    name: 'Snowy Owl',
+    nameEs: 'Búho Nival',
+    image: 'assets/images/snowy_owl.jpg',
+    description: 'Snowy owls are well-camouflaged and hunt during the day.',
+    descriptionEs: 'Los búhos nivales están bien camuflados y cazan durante el día.',
+    category: 'Arctic',
+    habitat: 'Arctic',
+  ),
+  Animal(
+    name: 'Walrus',
+    nameEs: 'Morsa',
+    image: 'assets/images/walrus.jpg',
+    description: 'Walruses have tusks and use them to pull themselves onto ice.',
+    descriptionEs: 'Las morsas tienen colmillos que usan para subirse al hielo.',
+    category: 'Arctic',
+    habitat: 'Arctic',
+  ),
+  Animal(
+    name: 'Harp Seal',
+    nameEs: 'Foca Arpa',
+    image: 'assets/images/harp_seal.jpg',
+    description: 'Harp seals are great swimmers and have thick fur as pups.',
+    descriptionEs: 'Las focas arpa son excelentes nadadoras y tienen un pelaje espeso cuando son crías.',
+    category: 'Arctic',
+    habitat: 'Arctic',
+  ),
+  Animal(
+    name: 'Reindeer',
+    nameEs: 'Reno',
+    image: 'assets/images/reindeer.jpg',
+    description: 'Reindeer migrate long distances and both males and females grow antlers.',
+    descriptionEs: 'Los renos migran largas distancias y tanto machos como hembras tienen astas.',
+    category: 'Arctic',
+    habitat: 'Arctic',
+  ),
 
-  // Forest
-  {
-    'name': 'Eagle',
-    'image': 'assets/images/eagle.jpg',
-    'description': 'Eagles soar high and have sharp vision.',
-    'category': 'Forest',
-  },
-  {
-    'name': 'Hawk',
-    'image': 'assets/images/hawk.png',
-    'description': 'Hawks are swift birds of prey.',
-    'category': 'Forest',
-  },
-  {
-    'name': 'Woodpecker',
-    'image': 'assets/images/woodpecker.jpg',
-    'description': 'Woodpeckers drum on trees to find insects.',
-    'category': 'Forest',
-  },
-  {
-    'name': 'Squirrel',
-    'image': 'assets/images/squirrel.jpg',
-    'description': 'Squirrels gather nuts and leap through trees.',
-    'category': 'Forest',
-  },
+  // ── Ocean ──
+  Animal(
+    name: 'Dolphin',
+    nameEs: 'Delfín',
+    image: 'assets/images/dolphin.jpg',
+    description: 'Dolphins are intelligent marine mammals known for their playful behavior.',
+    descriptionEs: 'Los delfines son mamíferos marinos inteligentes conocidos por su comportamiento juguetón.',
+    category: 'Ocean',
+    habitat: 'Ocean',
+  ),
+  Animal(
+    name: 'Shark',
+    nameEs: 'Tiburón',
+    image: 'assets/images/shark.jpg',
+    description: 'Sharks are powerful predators with excellent senses and strong jaws.',
+    descriptionEs: 'Los tiburones son depredadores poderosos con excelentes sentidos y mandíbulas fuertes.',
+    category: 'Ocean',
+    habitat: 'Ocean',
+  ),
+  Animal(
+    name: 'Octopus',
+    nameEs: 'Pulpo',
+    image: 'assets/images/octopus.jpg',
+    description: 'Octopuses have eight arms and can camouflage themselves to blend with surroundings.',
+    descriptionEs: 'Los pulpos tienen ocho brazos y pueden camuflarse para mezclarse con su entorno.',
+    category: 'Ocean',
+    habitat: 'Ocean',
+  ),
+  Animal(
+    name: 'Jellyfish',
+    nameEs: 'Medusa',
+    image: 'assets/images/jellyfish.jpg',
+    description: 'Jellyfish have soft bodies and use their tentacles to sting and catch prey.',
+    descriptionEs: 'Las medusas tienen cuerpos blandos y usan sus tentáculos para picar y atrapar presas.',
+    category: 'Ocean',
+    habitat: 'Ocean',
+  ),
+  Animal(
+    name: 'Clownfish',
+    nameEs: 'Pez Payaso',
+    image: 'assets/images/clownfish.jpg',
+    description: 'Clownfish live among sea anemones and are known for their bright orange color.',
+    descriptionEs: 'Los peces payaso viven entre anémonas y son conocidos por su color naranja brillante.',
+    category: 'Ocean',
+    habitat: 'Ocean',
+  ),
+  Animal(
+    name: 'Sea Turtle',
+    nameEs: 'Tortuga Marina',
+    image: 'assets/images/sea_turtle.jpg',
+    description: 'Sea turtles are long-living reptiles that can travel great distances in the ocean.',
+    descriptionEs: 'Las tortugas marinas son reptiles longevos que pueden recorrer grandes distancias en el océano.',
+    category: 'Ocean',
+    habitat: 'Ocean',
+  ),
+
+  // ── Forest ──
+  Animal(
+    name: 'Eagle',
+    nameEs: 'Águila',
+    image: 'assets/images/eagle.jpg',
+    description: 'Eagles soar high and have sharp vision.',
+    descriptionEs: 'Las águilas vuelan alto y tienen una visión aguda.',
+    category: 'Forest',
+  ),
+  Animal(
+    name: 'Woodpecker',
+    nameEs: 'Pájaro Carpintero',
+    image: 'assets/images/woodpecker.jpg',
+    description: 'Woodpeckers peck at trees to find insects and create nests.',
+    descriptionEs: 'Los pájaros carpinteros picotean árboles para encontrar insectos y hacer nidos.',
+    category: 'Forest',
+    habitat: 'Forest',
+  ),
+  Animal(
+    name: 'Squirrel',
+    nameEs: 'Ardilla',
+    image: 'assets/images/squirrel.jpg',
+    description: 'Squirrels gather nuts and leap between trees with agility.',
+    descriptionEs: 'Las ardillas recolectan nueces y saltan entre árboles con agilidad.',
+    category: 'Forest',
+    habitat: 'Forest',
+  ),
+  Animal(
+    name: 'Owl',
+    nameEs: 'Búho',
+    image: 'assets/images/owl.jpg',
+    description: 'Owls are nocturnal birds with excellent night vision.',
+    descriptionEs: 'Los búhos son aves nocturnas con excelente visión nocturna.',
+    category: 'Forest',
+    habitat: 'Forest',
+  ),
 ];
 
+/// Helper: get animals for a specific habitat page.
+List<Animal> animalsForHabitat(String habitat) =>
+    allAnimals.where((a) => a.habitat == habitat).toList();
+
+/// Helper: get animals for a memory game category.
+List<Animal> animalsForCategory(String category) =>
+    allAnimals.where((a) => a.category == category).toList();
