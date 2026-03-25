@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         '/desert': (context) => const DesertAnimalsApp(),
         '/forest': (context) => const ForestAnimalsApp(),
         '/arctic': (context) => const ArcticAnimalsApp(),
-        '/ocean' : (context) => const OceanAnimalsApp(),
+        '/ocean': (context) => const OceanAnimalsApp(),
       },
     );
   }
@@ -50,37 +50,48 @@ class _JungleMainPageState extends State<JungleMainPage> {
   void _showProfileDialog() {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          height: 270,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const CircleAvatar(
-                radius: 45,
-                backgroundImage: AssetImage('assets/images/user_icon.png'),
-                backgroundColor: Colors.green,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              height: 270,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 45,
+                    backgroundImage: AssetImage('assets/images/user_icon.png'),
+                    backgroundColor: Colors.green,
+                  ),
+                  const SizedBox(height: 15),
+                  const Text(
+                    "Explorer Profile",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Email: user@example.com",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const Spacer(),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                    label: const Text("Close"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade700,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 15),
-              const Text("Explorer Profile", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              const Text("Email: user@example.com", style: TextStyle(fontSize: 16)),
-              const Spacer(),
-              ElevatedButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close),
-                label: const Text("Close"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade700,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -120,16 +131,24 @@ class _JungleMainPageState extends State<JungleMainPage> {
       extendBodyBehindAppBar: true,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
-        transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+        transitionBuilder:
+            (child, animation) =>
+                FadeTransition(opacity: animation, child: child),
         child: pages[_selectedIndex],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
           boxShadow: [BoxShadow(color: Colors.black, blurRadius: 10)],
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
           child: BottomNavigationBar(
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
@@ -138,7 +157,10 @@ class _JungleMainPageState extends State<JungleMainPage> {
             unselectedItemColor: Colors.grey,
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-              BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Lessons'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.menu_book),
+                label: 'Lessons',
+              ),
               BottomNavigationBarItem(icon: Icon(Icons.quiz), label: 'Quiz'),
             ],
           ),
@@ -175,7 +197,13 @@ class JungleHomePage extends StatelessWidget {
                   fontSize: 34,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
-                  shadows: [Shadow(blurRadius: 8, color: Colors.black54, offset: Offset(2, 2))],
+                  shadows: [
+                    Shadow(
+                      blurRadius: 8,
+                      color: Colors.black54,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 40),
@@ -209,7 +237,13 @@ class JungleHomePage extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
-                    shadows: [Shadow(blurRadius: 5, color: Colors.black45, offset: Offset(1, 1))],
+                    shadows: [
+                      Shadow(
+                        blurRadius: 5,
+                        color: Colors.black45,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -235,13 +269,18 @@ class JungleHomePage extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.white,
-          boxShadow: [BoxShadow(color: glowColor, blurRadius: 20, spreadRadius: 2)],
+          boxShadow: [
+            BoxShadow(color: glowColor, blurRadius: 20, spreadRadius: 2),
+          ],
         ),
         child: Column(
           children: [
             Image.asset(image, height: 100, width: 175, fit: BoxFit.cover),
             const SizedBox(height: 10),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
           ],
         ),
       ),
