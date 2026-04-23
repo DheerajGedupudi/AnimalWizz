@@ -162,6 +162,10 @@ class _LifeCyclesGamePageState extends State<LifeCyclesGamePage>
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text('${widget.animal} Life Cycle'),
         backgroundColor: Colors.green.shade800,
         actions: [

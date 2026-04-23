@@ -234,7 +234,14 @@ class _FoodChainGamePageState extends State<FoodChainGamePage> {
     bool isTablet = screenWidth >= 600;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Food Chain Game"), backgroundColor: Colors.green),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text("Food Chain Game"),
+        backgroundColor: Colors.green,
+      ),
       body: Container(
         color: Colors.lightGreen[50],
         padding: EdgeInsets.symmetric(horizontal: isTablet ? 40 : 20),

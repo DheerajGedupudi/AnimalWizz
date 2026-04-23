@@ -392,6 +392,10 @@ class _TrackingQuizPageState extends State<TrackingQuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(showSpanish ? 'Rastreo' : 'Tracking Quiz'),
         backgroundColor: Colors.green.shade700,
         actions: [
